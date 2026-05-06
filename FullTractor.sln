@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTractor.Infrastructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTractor.Application", "FullTractor.Application\FullTractor.Application.csproj", "{75A85E8F-6C1F-4098-A23A-16B7717F677D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTractor.Api", "FullTractor.Api\FullTractor.Api.csproj", "{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{75A85E8F-6C1F-4098-A23A-16B7717F677D}.Release|x64.Build.0 = Release|Any CPU
 		{75A85E8F-6C1F-4098-A23A-16B7717F677D}.Release|x86.ActiveCfg = Release|Any CPU
 		{75A85E8F-6C1F-4098-A23A-16B7717F677D}.Release|x86.Build.0 = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|x64.Build.0 = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F3E240F-4362-49A3-BF1A-BD7E5E42CC97}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
