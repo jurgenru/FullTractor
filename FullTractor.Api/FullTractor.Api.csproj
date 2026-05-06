@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FullTractor.Domain\FullTractor.Domain.csproj" />
+    <ProjectReference Include="..\FullTractor.Application\FullTractor.Application.csproj" />
+    <ProjectReference Include="..\FullTractor.Infrastructure\FullTractor.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
