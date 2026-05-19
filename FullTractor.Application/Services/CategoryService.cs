@@ -1,5 +1,7 @@
 using FullTractor.Application.DTOs.Category.Request;
 using FullTractor.Application.DTOs.Category.Response;
+using FullTractor.Application.DTOs.Service;
+using FullTractor.Application.Enums;
 using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
@@ -15,48 +17,45 @@ public class CategoryService : ICategoryService
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
     }
-    public async Task<List<CategoryResponse>> GetAllCategoriesAsync()
+    public async Task<ServiceResponse<List<CategoryResponse>>> GetAllCategoriesAsync()
     {
-        var categoriesResponseList = await _categoryRepository.GetAllCategoriesAsync();
-        return ConvertToCategoryResponseList(categoriesResponseList);
+        List<Category> categoriesResponseList = await _categoryRepository.GetAllCategoriesAsync();
+        return ConvertToServiceListCategoryResponse(categoriesResponseList);
     }
-    public async Task<CategoryResponse?> GetCategoryByIdAsync(int id)
+    public async Task<ServiceResponse<CategoryResponse>> GetCategoryByIdAsync(int id)
     {
-        var categoryResponse = await _categoryRepository.GetCategoryByIdAsync(id);
-        if (categoryResponse != null) return ConvertToCategoryResponse(categoryResponse);
-        return null;
+        Category? categoryResponse = await _categoryRepository.GetCategoryByIdAsync(id);
+        if (categoryResponse == null) return new ServiceResponse<CategoryResponse> { Status = Status.NotFound };
+        return ConvertToServiceCategoryResponse(categoryResponse);
     }
-    public async Task<CategoryResponse> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
+    public async Task<ServiceResponse<CategoryResponse>> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
     {
         Category categoryResponse = await _categoryRepository.CreateCategoryAsync(new Category { Name = createCategoryRequest.Name });
-        return ConvertToCategoryResponse(categoryResponse);
+        return ConvertToServiceCategoryResponse(categoryResponse);
     }
-    public async Task<CategoryResponse?> UpdateCategoryAsync(int id, UpdateCategoryRequest updateCategoryRequest)
+    public async Task<ServiceResponse<CategoryResponse>> UpdateCategoryAsync(int id, UpdateCategoryRequest updateCategoryRequest)
     {
-        CategoryResponse? categoryResponse = await GetCategoryByIdAsync(id);
-        if (categoryResponse != null)
-        {
-            return ConvertToCategoryResponse(await _categoryRepository.UpdateCategoryAsync(new Category { Id = id, Name = updateCategoryRequest.Name }));
-        }
-        return categoryResponse;
+        ServiceResponse<CategoryResponse> categoryResponse = await GetCategoryByIdAsync(id);
+        if (categoryResponse.Data == null) return categoryResponse;
+        return ConvertToServiceCategoryResponse(await _categoryRepository.UpdateCategoryAsync(new Category { Id = id, Name = updateCategoryRequest.Name }));
     }
-    public async Task<bool> DeleteCategoryAsync(int id)
+    public async Task<ServiceResponse<CategoryResponse>> DeleteCategoryAsync(int id)
     {
-        CategoryResponse? categoryResponse = await GetCategoryByIdAsync(id);
-        if (categoryResponse != null)
-        {
-            List<Product> productList = await _productRepository.GetProductsByCategoryIdAsync(id);
-            if (productList.Count == 0) return await _categoryRepository.DeleteCategoryAsync(id);
-        }
-        return false;
+        ServiceResponse<CategoryResponse> categoryResponse = await GetCategoryByIdAsync(id);
+        if (categoryResponse.Data == null) return categoryResponse;
+        List<Product> productList = await _productRepository.GetProductsByCategoryIdAsync(id);
+        if (productList.Count != 0) return new ServiceResponse<CategoryResponse> { Status = Status.CategoryHasProductsRelated };
+        bool deleteCategory = await _categoryRepository.DeleteCategoryAsync(id);
+        if(!deleteCategory) return new ServiceResponse<CategoryResponse>{Status = Status.DeleteError };
+        return new ServiceResponse<CategoryResponse>{Status = Status.Success };
     }
-    private static List<CategoryResponse> ConvertToCategoryResponseList(List<Category> categoryList)
+    private static ServiceResponse<List<CategoryResponse>> ConvertToServiceListCategoryResponse(List<Category> categoryList)
     {
-        if (categoryList.Count == 0) return [];
-        return [.. categoryList.Select(c => new CategoryResponse { Id = c.Id, Name = c.Name })];
+        if (categoryList.Count == 0) return new ServiceResponse<List<CategoryResponse>> { Status = Status.NotFound };
+        return new ServiceResponse<List<CategoryResponse>> { Status = Status.Success, Data = [.. categoryList.Select(c => new CategoryResponse { Id = c.Id, Name = c.Name })] };
     }
-    private static CategoryResponse ConvertToCategoryResponse(Category category)
+    private static ServiceResponse<CategoryResponse> ConvertToServiceCategoryResponse(Category category)
     {
-        return new CategoryResponse { Id = category.Id, Name = category.Name };
+        return new ServiceResponse<CategoryResponse> { Status = Status.Success, Data = new CategoryResponse { Id = category.Id, Name = category.Name } };
     }
 }
