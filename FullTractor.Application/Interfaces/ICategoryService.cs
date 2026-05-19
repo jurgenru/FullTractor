@@ -1,13 +1,14 @@
 using FullTractor.Application.DTOs.Category.Request;
 using FullTractor.Application.DTOs.Category.Response;
+using FullTractor.Application.DTOs.Service;
 
 namespace FullTractor.Application.Interfaces;
 
 public interface ICategoryService
 {
-    public Task<List<CategoryResponse>> GetAllCategoriesAsync();
-    public Task<CategoryResponse?> GetCategoryByIdAsync(int id);
-    public Task<CategoryResponse> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest);
-    public Task<CategoryResponse?> UpdateCategoryAsync(int id, UpdateCategoryRequest updateCategoryRequest);
-    public Task<bool> DeleteCategoryAsync(int id);
+    public Task<ServiceResponse<List<CategoryResponse>>> GetAllCategoriesAsync();
+    public Task<ServiceResponse<CategoryResponse>> GetCategoryByIdAsync(int id);
+    public Task<ServiceResponse<CategoryResponse>> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest);
+    public Task<ServiceResponse<CategoryResponse>> UpdateCategoryAsync(int id, UpdateCategoryRequest updateCategoryRequest);
+    public Task<ServiceResponse<CategoryResponse>> DeleteCategoryAsync(int id);
 }
