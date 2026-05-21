@@ -19,7 +19,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> GetCategoryByIdAsync(int categoryId)
     {
-        return await _fullTractorContext.Categories.FindAsync(categoryId);
+        return await _fullTractorContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == categoryId);
     }
 
     public async Task<Category> CreateCategoryAsync(Category category)
