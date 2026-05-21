@@ -5,5 +5,6 @@ public enum Status
     Success,
     NotFound,
     CategoryHasProductsRelated,
-    DeleteError
+    DeleteError,
+    UpdateError
 }
