@@ -10,8 +10,8 @@ namespace FullTractor.Application.Services;
 
 public class CategoryService : ICategoryService
 {
-    readonly ICategoryRepository _categoryRepository;
-    readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IProductRepository _productRepository;
     public CategoryService(ICategoryRepository categoryRepository, IProductRepository productRepository)
     {
         _productRepository = productRepository;

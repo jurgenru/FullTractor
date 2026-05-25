@@ -40,13 +40,10 @@ public class OrderRepository : IOrderRepository
         }
     }
 
-    public async Task<Order> UpdateOrderAsync(Order order)
+    public async Task<bool> DeleteOrderAsync(int orderId)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> DeleteOrderAsync(int orderId)
-    {
-        throw new NotImplementedException();
+        var numDeleted = await _fulltractorContext.Orders.Where(o => o.Id == orderId).ExecuteDeleteAsync();
+        if (numDeleted == 0) return false;
+        return true;
     }
 }

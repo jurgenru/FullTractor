@@ -39,14 +39,14 @@ public class CategoryRepository : ICategoryRepository
     public async Task<Category?> UpdateCategoryAsync(Category category)
     {
         int numUpdated = await _fullTractorContext.Categories.Where(c => c.Id == category.Id).ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Name, category.Name));
-        if (numUpdated == 1) return category;
-        return null;
+        if (numUpdated == 0) return null;
+        return category;
     }
 
     public async Task<bool> DeleteCategoryAsync(int categoryId)
     {
-        int numUpdated = await _fullTractorContext.Categories.Where(c => c.Id == categoryId).ExecuteDeleteAsync();
-        if (numUpdated == 1) return true;
-        return false;
+        int numDeleted = await _fullTractorContext.Categories.Where(c => c.Id == categoryId).ExecuteDeleteAsync();
+        if (numDeleted == 0) return false;
+        return true;
     }
 }
