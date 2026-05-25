@@ -36,29 +36,17 @@ public class CategoryRepository : ICategoryRepository
         }
     }
 
-    public async Task<Category> UpdateCategoryAsync(Category category)
+    public async Task<Category?> UpdateCategoryAsync(Category category)
     {
-        try
-        {
-            await _fullTractorContext.Categories.Where(c => c.Id == category.Id).ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Name, category.Name));
-            return category;
-        }
-        catch (DbUpdateException updateException)
-        {
-            throw new Exception("Unable to update category. Verify if the properties are correct or the database connection.", updateException);
-        }
+        int numUpdated = await _fullTractorContext.Categories.Where(c => c.Id == category.Id).ExecuteUpdateAsync(setters => setters.SetProperty(c => c.Name, category.Name));
+        if (numUpdated == 0) return null;
+        return category;
     }
 
     public async Task<bool> DeleteCategoryAsync(int categoryId)
     {
-        try
-        {
-            await _fullTractorContext.Categories.Where(c => c.Id == categoryId).ExecuteDeleteAsync();
-            return true;
-        }
-        catch (DbUpdateException updateException)
-        {
-            throw new Exception("Unable to delete category. Verify the database connection", updateException);
-        }
+        int numDeleted = await _fullTractorContext.Categories.Where(c => c.Id == categoryId).ExecuteDeleteAsync();
+        if (numDeleted == 0) return false;
+        return true;
     }
 }

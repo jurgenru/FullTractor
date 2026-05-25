@@ -10,8 +10,8 @@ namespace FullTractor.Application.Services;
 
 public class CategoryService : ICategoryService
 {
-    readonly ICategoryRepository _categoryRepository;
-    readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IProductRepository _productRepository;
     public CategoryService(ICategoryRepository categoryRepository, IProductRepository productRepository)
     {
         _productRepository = productRepository;
@@ -37,7 +37,9 @@ public class CategoryService : ICategoryService
     {
         ServiceResponse<CategoryResponse> categoryResponse = await GetCategoryByIdAsync(id);
         if (categoryResponse.Data == null) return categoryResponse;
-        return ConvertToServiceCategoryResponse(await _categoryRepository.UpdateCategoryAsync(new Category { Id = id, Name = updateCategoryRequest.Name }));
+        var categoryUpdated = await _categoryRepository.UpdateCategoryAsync(new Category { Id = id, Name = updateCategoryRequest.Name });
+        if (categoryUpdated == null) return new ServiceResponse<CategoryResponse> { Status = Status.UpdateError };
+        return ConvertToServiceCategoryResponse(categoryUpdated);
     }
     public async Task<ServiceResponse<CategoryResponse>> DeleteCategoryAsync(int id)
     {
@@ -46,8 +48,8 @@ public class CategoryService : ICategoryService
         List<Product> productList = await _productRepository.GetProductsByCategoryIdAsync(id);
         if (productList.Count != 0) return new ServiceResponse<CategoryResponse> { Status = Status.CategoryHasProductsRelated };
         bool deleteCategory = await _categoryRepository.DeleteCategoryAsync(id);
-        if(!deleteCategory) return new ServiceResponse<CategoryResponse>{Status = Status.DeleteError };
-        return new ServiceResponse<CategoryResponse>{Status = Status.Success };
+        if (!deleteCategory) return new ServiceResponse<CategoryResponse> { Status = Status.DeleteError };
+        return new ServiceResponse<CategoryResponse> { Status = Status.Success };
     }
     private static ServiceResponse<List<CategoryResponse>> ConvertToServiceListCategoryResponse(List<Category> categoryList)
     {
