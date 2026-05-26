@@ -22,6 +22,11 @@ public class OrderRepository : IOrderRepository
         return await _fulltractorContext.Orders.AsNoTracking().Where(o => o.UserId == userId).ToListAsync();
     }
 
+    public async Task<ICollection<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
+    {
+        return await _fulltractorContext.Orders.AsNoTrackingWithIdentityResolution().Include(o => o.OrderItems.Where(oI => oI.OrderId == orderId)).SelectMany(o => o.OrderItems).ToListAsync();
+    }
+
     public async Task<Order?> GetOrderByIdAsync(int orderId)
     {
         return await _fulltractorContext.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId);
