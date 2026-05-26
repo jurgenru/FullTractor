@@ -2,7 +2,7 @@ using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-
+namespace FullTractor.Infrastructure.Repositories;
 public class ProductRepository : IProductRepository
 {
     private readonly FullTractorContext _fullTractorContext;
