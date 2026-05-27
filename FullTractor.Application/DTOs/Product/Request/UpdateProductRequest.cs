@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FullTractor.Application.DTOs.Category.Response;
+using FullTractor.Domain.Entities;
 
 namespace FullTractor.Application.DTOs.Product;
 
