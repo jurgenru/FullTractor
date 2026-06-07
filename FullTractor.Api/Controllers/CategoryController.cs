@@ -24,7 +24,7 @@ public class CategoryController : ControllerBase
         return Ok(categoryList);
     }
 
-    [HttpGet("id")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> GetCategoryByIdAsync([FromRoute] int id)
     {
         ServiceResponse<CategoryResponse> getCategory = await _categoryService.GetCategoryByIdAsync(id);
@@ -36,23 +36,42 @@ public class CategoryController : ControllerBase
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> CreateCategoryAsync([FromBody] CreateCategoryRequest createCategory)
     {
         ServiceResponse<CategoryResponse> categoryCreated = await _categoryService.CreateCategoryAsync(createCategory);
-        if(categoryCreated.Status != Status.Success) return Problem(statusCode: StatusCodes.Status400BadRequest, detail: categoryCreated.Status.ToString());
-        return Ok(categoryCreated);
+        switch (categoryCreated.Status)
+        {
+            case Status.CategoryExists:
+                return Problem(statusCode: StatusCodes.Status409Conflict, detail: categoryCreated.Status.ToString());
+            default:
+                return CreatedAtAction(nameof(GetCategoryByIdAsync), new {id = categoryCreated.Data?.Id}, categoryCreated);
+        }        
     }
 
-    [HttpPut]
-    public async Task<ActionResult<ServiceResponse<CategoryResponse>>> UpdateCategoryAsync([FromBody]int id, UpdateCategoryRequest updateCategory)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ServiceResponse<CategoryResponse>>> UpdateCategoryAsync([FromRoute]int id, [FromBody]UpdateCategoryRequest updateCategory)
     {
         ServiceResponse<CategoryResponse> categoryUpdated = await _categoryService.UpdateCategoryAsync(id, updateCategory);
-        if(categoryUpdated.Status == Status.UpdateError) return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: categoryUpdated.Status.ToString());
-        return Ok(categoryUpdated);
+        switch (categoryUpdated.Status)
+        {
+            case Status.NotFound:
+                return Problem(statusCode: StatusCodes.Status404NotFound, detail: categoryUpdated.Status.ToString());
+            case Status.UpdateError:
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: categoryUpdated.Status.ToString());
+            default:
+                return Ok(categoryUpdated);
+        }
     }
 
-    [HttpDelete("id")]
+    [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> DeleteCategoryAsync([FromRoute]int id)
     {
         ServiceResponse<CategoryResponse> categoryDeleted = await _categoryService.DeleteCategoryAsync(id);
-        if(categoryDeleted.Status == Status.DeleteError) return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: categoryDeleted.Status.ToString());
-        return Ok(categoryDeleted);
+        switch (categoryDeleted.Status)
+        {
+            case Status.NotFound:
+                return Problem(statusCode: StatusCodes.Status404NotFound, detail: categoryDeleted.Status.ToString());
+            case Status.DeleteError:
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: categoryDeleted.Status.ToString());
+            default:
+                return Ok(categoryDeleted);
+        }
     }
 }

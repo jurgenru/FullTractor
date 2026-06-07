@@ -1,5 +1,10 @@
+using FullTractor.Application.Interfaces;
+using FullTractor.Application.Services;
+using FullTractor.Domain.Interfaces;
 using FullTractor.Infrastructure.Context;
+using FullTractor.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DbCon") ?? throw new InvalidOperationException("Connection string 'DbCon' not found.");
@@ -10,6 +15,11 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 // Add context to the project.
 builder.Services.AddDbContext<FullTractorContext>(options => options.UseSqlServer(connectionString));
+// Add DI of repository depedencies
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+// Add DI of service depedencies
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -24,6 +34,7 @@ app.UseStatusCodePages();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

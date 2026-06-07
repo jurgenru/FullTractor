@@ -1,6 +1,8 @@
 using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
+using FullTractor.Domain.Exceptions;
 using FullTractor.Infrastructure.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 namespace FullTractor.Infrastructure.Repositories;
 
@@ -22,6 +24,11 @@ public class CategoryRepository : ICategoryRepository
         return await _fullTractorContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == categoryId);
     }
 
+    public async Task<Category?> GetCategoryByNameAsync(string name)
+    {
+        return await _fullTractorContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Name == name);
+    }
+
     public async Task<Category> CreateCategoryAsync(Category category)
     {
         try
@@ -32,7 +39,12 @@ public class CategoryRepository : ICategoryRepository
         }
         catch (DbUpdateException updateException)
         {
-            throw new Exception("Unable to create category. Verify if the properties are correct or the database connection.", updateException);
+            if (updateException.InnerException is SqlException upEx && (upEx.Number == 2627 || upEx.Number == 2601))
+            {
+
+                throw new DuplicateRecordException($"{category.Name} already exists");
+            }
+            throw;
         }
     }
 

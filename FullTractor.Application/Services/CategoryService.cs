@@ -4,6 +4,7 @@ using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.Enums;
 using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;
+using FullTractor.Domain.Exceptions;
 using FullTractor.Domain.Interfaces;
 
 namespace FullTractor.Application.Services;
@@ -28,10 +29,25 @@ public class CategoryService : ICategoryService
         if (categoryResponse == null) return new ServiceResponse<CategoryResponse> { Status = Status.NotFound };
         return ConvertToServiceCategoryResponse(categoryResponse);
     }
+    public async Task<ServiceResponse<CategoryResponse>> GetCategoryByNameAsync(string name)
+    {
+        Category? category = await _categoryRepository.GetCategoryByNameAsync(name);
+        if (category != null) return new ServiceResponse<CategoryResponse> { Status = Status.CategoryExists };
+        return new ServiceResponse<CategoryResponse> { Status = Status.CategoryNotExists };
+    }
     public async Task<ServiceResponse<CategoryResponse>> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
     {
-        Category categoryResponse = await _categoryRepository.CreateCategoryAsync(new Category { Name = createCategoryRequest.Name });
-        return ConvertToServiceCategoryResponse(categoryResponse);
+        ServiceResponse<CategoryResponse> categoryExists = await GetCategoryByNameAsync(createCategoryRequest.Name);
+        if (categoryExists.Status == Status.CategoryExists) return categoryExists;
+        try
+        {
+            Category categoryResponse = await _categoryRepository.CreateCategoryAsync(new Category { Name = createCategoryRequest.Name });
+            return ConvertToServiceCategoryResponse(categoryResponse);
+        }
+        catch (DuplicateRecordException)
+        {
+            return new ServiceResponse<CategoryResponse> { Status = Status.CategoryExists };
+        }
     }
     public async Task<ServiceResponse<CategoryResponse>> UpdateCategoryAsync(int id, UpdateCategoryRequest updateCategoryRequest)
     {
