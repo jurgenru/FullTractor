@@ -17,7 +17,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ServiceResponse<List<CategoryResponse>>>> GetAllCategories()
+    public async Task<ActionResult<ServiceResponse<List<CategoryResponse>>>> GetAllCategoriesAsync()
     {
         ServiceResponse<List<CategoryResponse>> categoryList = await _categoryService.GetAllCategoriesAsync();
         if(categoryList.Status != Status.Success) return Problem(statusCode: StatusCodes.Status404NotFound, detail: "");

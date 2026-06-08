@@ -9,5 +9,7 @@ public enum Status
     UpdateError,
     DuplicateError,
     CategoryExists,
-    CategoryNotExists
+    CategoryNotExists,
+    ProductExists,
+    ProductNotExists
 }
