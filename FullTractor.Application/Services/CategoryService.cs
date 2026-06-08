@@ -37,8 +37,8 @@ public class CategoryService : ICategoryService
     }
     public async Task<ServiceResponse<CategoryResponse>> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
     {
-        ServiceResponse<CategoryResponse> categoryExists = await GetCategoryByNameAsync(createCategoryRequest.Name);
-        if (categoryExists.Status == Status.CategoryExists) return categoryExists;
+        ServiceResponse<CategoryResponse> categoryExist = await GetCategoryByNameAsync(createCategoryRequest.Name);
+        if (categoryExist.Status == Status.CategoryExists) return categoryExist;
         try
         {
             Category categoryResponse = await _categoryRepository.CreateCategoryAsync(new Category { Name = createCategoryRequest.Name });

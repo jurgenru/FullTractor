@@ -8,6 +8,7 @@ public interface IProductService
 {
     public Task<ServiceResponse<List<ProductResponse>>> GetAllProductsAsync();
     public Task<ServiceResponse<ProductResponse>> GetProductByIdAsync(int productId);
+    public Task<ServiceResponse<ProductResponse>> GetProductByNameAsync(string name);
     public Task<ServiceResponse<List<ProductResponse>>> GetProductsByCategoryIdAsync(int categoryId);
     public Task<ServiceResponse<ProductResponse>> UpdateProductAsync(int productId, UpdateProductRequest updateProduct);
     public Task<ServiceResponse<ProductResponse>> CreateProductAsync(CreateProductRequest createProduct);

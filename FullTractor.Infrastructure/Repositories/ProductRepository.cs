@@ -1,6 +1,8 @@
 using FullTractor.Domain.Entities;
+using FullTractor.Domain.Exceptions;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Infrastructure.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 namespace FullTractor.Infrastructure.Repositories;
 public class ProductRepository : IProductRepository
@@ -14,6 +16,11 @@ public class ProductRepository : IProductRepository
     public async Task<List<Product>> GetAllProductsAsync()
     {
         return await _fullTractorContext.Products.AsNoTracking().ToListAsync();
+    }
+
+    public async Task<Product?> GetProductByNameAsync(string name)
+    {
+        return await _fullTractorContext.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Name == name);
     }
 
     public async Task<Product?> GetProductByIdAsync(int productId)
@@ -36,7 +43,11 @@ public class ProductRepository : IProductRepository
         }
         catch (DbUpdateException updateEx)
         {
-            throw new Exception("Unable to create product. Verify if the properties are correct or the database connection.", updateEx);
+            if(updateEx.InnerException is SqlException upEx && (upEx.Number == 2627 || upEx.Number == 2601))
+            {
+                throw new DuplicateRecordException($"{product.Name} already exist");
+            }
+            throw;
         }
     }
 

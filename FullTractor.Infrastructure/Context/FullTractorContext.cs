@@ -13,5 +13,6 @@ public class FullTractorContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>().HasIndex(c => c.Name).IsUnique();
+        modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique();
     }
 }

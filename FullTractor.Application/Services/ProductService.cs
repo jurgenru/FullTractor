@@ -6,6 +6,7 @@ using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Application.Enums;
 using FullTractor.Application.DTOs.Category.Response;
+using FullTractor.Domain.Exceptions;
 
 namespace FullTractor.Application.Services;
 
@@ -21,23 +22,37 @@ public class ProductService : IProductService
         List<Product> listProduct = await _productRepository.GetAllProductsAsync();
         return ConvertToProductList(listProduct);
     }
-
     public async Task<ServiceResponse<ProductResponse>> GetProductByIdAsync(int productId)
     {
         Product? product = await _productRepository.GetProductByIdAsync(productId);
         if (product == null) return new ServiceResponse<ProductResponse> { Status = Status.NotFound };
         return ConvertToProductResponse(product);
     }
+    public async Task<ServiceResponse<ProductResponse>> GetProductByNameAsync(string name)
+    {
+        Product? product = await _productRepository.GetProductByNameAsync(name);
+        if (product != null) return new ServiceResponse<ProductResponse> { Status = Status.ProductExists };
+        return new ServiceResponse<ProductResponse> { Status = Status.ProductNotExists };
+    }
     public async Task<ServiceResponse<List<ProductResponse>>> GetProductsByCategoryIdAsync(int categoryId)
     {
         List<Product> productList = await _productRepository.GetProductsByCategoryIdAsync(categoryId);
-        if(productList.Count == 0) return new ServiceResponse<List<ProductResponse>> {Status = Status.NotFound};
+        if (productList.Count == 0) return new ServiceResponse<List<ProductResponse>> { Status = Status.NotFound };
         return ConvertToProductList(productList);
     }
     public async Task<ServiceResponse<ProductResponse>> CreateProductAsync(CreateProductRequest createProduct)
     {
-        Product product = await _productRepository.CreateProductAsync(new Product { Name = createProduct.Name, Description = createProduct.Description, Price = createProduct.Price, Stock = createProduct.Stock, CategoryId = createProduct.Category.Id, Category = new Category { Name = createProduct.Category.Name, Id = createProduct.Category.Id } });
-        return ConvertToProductResponse(product);
+        ServiceResponse<ProductResponse> productExist = await GetProductByNameAsync(createProduct.Name);
+        if (productExist.Status == Status.ProductExists) return productExist;
+        try
+        {
+            Product product = await _productRepository.CreateProductAsync(new Product { Name = createProduct.Name, Description = createProduct.Description, Price = createProduct.Price, Stock = createProduct.Stock, CategoryId = createProduct.Category.Id, Category = new Category { Name = createProduct.Category.Name, Id = createProduct.Category.Id } });
+            return ConvertToProductResponse(product);
+        }
+        catch (DuplicateRecordException)
+        {
+            return new ServiceResponse<ProductResponse> { Status = Status.ProductExists };
+        }
     }
 
     public async Task<ServiceResponse<ProductResponse>> UpdateProductAsync(int productId, UpdateProductRequest updateProduct)

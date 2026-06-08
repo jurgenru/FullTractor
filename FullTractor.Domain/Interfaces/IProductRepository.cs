@@ -6,6 +6,7 @@ public interface IProductRepository
 {
     public Task<List<Product>> GetProductsByCategoryIdAsync(int categoryId);
     public Task<List<Product>> GetAllProductsAsync();
+    public Task<Product?> GetProductByNameAsync(string name);
     public Task<Product?> GetProductByIdAsync(int productId);
     public Task<Product> CreateProductAsync(Product product);
     public Task<Product?> UpdateProductAsync(Product product);
