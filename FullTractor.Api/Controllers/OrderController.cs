@@ -7,7 +7,7 @@ using FullTractor.Application.Enums;
 namespace FullTractor.Api.Controllers;
 
 [ApiController]
-[Route("Controller")]
+[Route("[controller]")]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;

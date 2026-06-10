@@ -7,7 +7,7 @@ using FullTractor.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("Controller")]
+[Route("[controller]")]
 public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
