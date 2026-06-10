@@ -11,5 +11,7 @@ public enum Status
     CategoryExists,
     CategoryNotExists,
     ProductExists,
-    ProductNotExists
+    ProductNotExists,
+    OrderItemNotExist,
+    CreateOrderError
 }
