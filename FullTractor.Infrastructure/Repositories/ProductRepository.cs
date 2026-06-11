@@ -54,7 +54,7 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> UpdateProductAsync(Product product)
     {
         var numUpdated = await _fullTractorContext.Products.Where(p => p.Id == product.Id).ExecuteUpdateAsync(setters => setters
-                                    .SetProperty(p => p.Category, product.Category)
+                                    .SetProperty(p => p.CategoryId, product.CategoryId)
                                     .SetProperty(p => p.Description, product.Description)
                                     .SetProperty(p => p.Name, product.Name)
                                     .SetProperty(p => p.Price, product.Price)

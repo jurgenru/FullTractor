@@ -32,10 +32,10 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
-    [HttpGet("{id}/products")]
-    public async Task<ActionResult<ServiceResponse<List<ProductResponse>>>> GetProductsByCategoryIdAsync([FromRoute] int id)
+    [HttpGet("{categoryId}/products")]
+    public async Task<ActionResult<ServiceResponse<List<ProductResponse>>>> GetProductsByCategoryIdAsync([FromRoute] int categoryId)
     {
-        ServiceResponse<List<ProductResponse>> productList = await _productService.GetProductsByCategoryIdAsync(id);
+        ServiceResponse<List<ProductResponse>> productList = await _productService.GetProductsByCategoryIdAsync(categoryId);
         if (productList.Status != Status.Success) return Problem(statusCode: StatusCodes.Status404NotFound, detail: productList.Status.ToString());
         return Ok(productList);
     }
@@ -46,10 +46,10 @@ public class ProductController : ControllerBase
         ServiceResponse<ProductResponse> productCreated = await _productService.CreateProductAsync(createProduct);
         switch (productCreated.Status)
         {
-            case Status.CategoryExists:
+            case Status.ProductExists:
                 return Problem(statusCode: StatusCodes.Status409Conflict, detail: productCreated.Status.ToString());
             default:
-                return CreatedAtAction(nameof(GetProductByIdAsync), new {id = productCreated.Data?.Id}, productCreated);
+                return CreatedAtAction("GetProductById", new { id = productCreated.Data?.Id }, productCreated);
         }
     }
 
@@ -71,7 +71,7 @@ public class ProductController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<ProductResponse>>> DeleteProductAsync([FromRoute] int id)
     {
-         ServiceResponse<ProductResponse> productDelete = await _productService.DeleteProductAsync(id);
+        ServiceResponse<ProductResponse> productDelete = await _productService.DeleteProductAsync(id);
         switch (productDelete.Status)
         {
             case Status.NotFound:

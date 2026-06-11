@@ -9,7 +9,7 @@ public class UpdateProductRequest
     [Required(ErrorMessage = "Name is required for product")]
     public required string Name { get; set; }
     [Required(ErrorMessage = "Category is required for product")]
-    public required CategoryResponse Category { get; set; }
+    public int CategoryId { get; set; }
     [Range(0, int.MaxValue, MinimumIsExclusive = true, ErrorMessage = "Stock must be bigger than 0")]
     public int Stock { get; set; }
     [Range(0, int.MaxValue, MinimumIsExclusive = true, ErrorMessage = "Price must be bigger than 0")]
