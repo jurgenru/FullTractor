@@ -46,7 +46,7 @@ public class ProductService : IProductService
         if (productExist.Status == Status.ProductExists) return productExist;
         try
         {
-            Product product = await _productRepository.CreateProductAsync(new Product { Name = createProduct.Name, Description = createProduct.Description, Price = createProduct.Price, Stock = createProduct.Stock, CategoryId = createProduct.Category.Id, Category = new Category { Name = createProduct.Category.Name, Id = createProduct.Category.Id } });
+            Product product = await _productRepository.CreateProductAsync(new Product { Name = createProduct.Name, Description = createProduct.Description, Price = createProduct.Price, Stock = createProduct.Stock, CategoryId = createProduct.CategoryId });
             return ConvertToProductResponse(product);
         }
         catch (DuplicateRecordException)
@@ -59,7 +59,7 @@ public class ProductService : IProductService
     {
         ServiceResponse<ProductResponse> productExist = await GetProductByIdAsync(productId);
         if (productExist.Data == null) return productExist;
-        Product? productUpdate = await _productRepository.UpdateProductAsync(new Product { Name = updateProduct.Name, Description = updateProduct.Description, Price = updateProduct.Price, Stock = updateProduct.Stock, Category = new Category { Name = updateProduct.Category.Name, Id = updateProduct.Category.Id }, CategoryId = updateProduct.Category.Id });
+        Product? productUpdate = await _productRepository.UpdateProductAsync(new Product { Id = productId, Name = updateProduct.Name, Description = updateProduct.Description, Price = updateProduct.Price, Stock = updateProduct.Stock, CategoryId = updateProduct.CategoryId });
         if (productUpdate == null) return new ServiceResponse<ProductResponse> { Status = Status.UpdateError };
         return ConvertToProductResponse(productUpdate);
     }
@@ -76,10 +76,10 @@ public class ProductService : IProductService
     private ServiceResponse<List<ProductResponse>> ConvertToProductList(List<Product> productList)
     {
         if (productList.Count == 0) return new ServiceResponse<List<ProductResponse>> { Status = Status.NotFound };
-        return new ServiceResponse<List<ProductResponse>> { Status = Status.Success, Data = [.. productList.Select(p => new ProductResponse { Name = p.Name, Description = p.Description, Stock = p.Stock, Price = p.Price, Category = new CategoryResponse { Name = p.Category.Name, Id = p.Category.Id } })] };
+        return new ServiceResponse<List<ProductResponse>> { Status = Status.Success, Data = [.. productList.Select(p => new ProductResponse { Id = p.Id, Name = p.Name, Description = p.Description, Stock = p.Stock, Price = p.Price, CategoryId = p.CategoryId })] };
     }
     private ServiceResponse<ProductResponse> ConvertToProductResponse(Product product)
     {
-        return new ServiceResponse<ProductResponse> { Status = Status.Success, Data = new ProductResponse { Description = product.Description, Name = product.Name, Price = product.Price, Stock = product.Stock, Category = new CategoryResponse { Name = product.Category.Name, Id = product.Category.Id } } };
+        return new ServiceResponse<ProductResponse> { Status = Status.Success, Data = new ProductResponse { Id = product.Id, Description = product.Description, Name = product.Name, Price = product.Price, Stock = product.Stock, CategoryId = product.CategoryId } };
     }
 }
