@@ -28,7 +28,21 @@ public class UserController : ControllerBase
         if (user.Status == Status.NotFound) return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Status.ToString());
         return Ok(user);
     }
-    // public Task<ServiceResponse<UserResponse>> GetPasswordByEmailAsync(UserRequest createUserRequest);
+
+    [HttpGet]
+    public async Task<ActionResult<ServiceResponse<UserResponse>>> GetPasswordByEmailAsync(UserRequest userRequest)
+    {
+        ServiceResponse<UserResponse> user = await _userService.GetPasswordByEmailAsync(userRequest);
+        switch (user.Status)
+        {
+            case Status.NotFound:
+                return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Status.ToString());
+            case Status.PasswordIncorrect:
+                return Problem(statusCode: StatusCodes.Status401Unauthorized, detail: user.Status.ToString());
+            default:
+                return Ok(user);
+        }
+    }
 
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<UserResponse>>> CreateUserAsync([FromBody] UserRequest userRequest)
