@@ -13,5 +13,9 @@ public enum Status
     ProductExists,
     ProductNotExists,
     OrderItemNotExist,
-    CreateOrderError
+    CreateOrderError,
+    UserExists,
+    PasswordCorrect,
+    PasswordIncorrect,
+    EmailExists
 }

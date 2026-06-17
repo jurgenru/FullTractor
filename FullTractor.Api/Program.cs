@@ -1,8 +1,10 @@
+using FullTractor.Application.DTOs;
 using FullTractor.Application.Interfaces;
 using FullTractor.Application.Services;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Infrastructure.Context;
 using FullTractor.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -15,6 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 // Add context to the project.
 builder.Services.AddDbContext<FullTractorContext>(options => options.UseSqlServer(connectionString));
+//Add DI of passwordhasher
+builder.Services.AddScoped<IPasswordHasher<UserRequest>, PasswordHasher<UserRequest>>();
 // Add DI of repository depedencies
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
