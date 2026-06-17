@@ -14,5 +14,6 @@ public class FullTractorContext : DbContext
     {
         modelBuilder.Entity<Category>().HasIndex(c => c.Name).IsUnique();
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique();
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
     }
 }

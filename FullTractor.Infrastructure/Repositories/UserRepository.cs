@@ -1,6 +1,8 @@
 using FullTractor.Domain.Entities;
+using FullTractor.Domain.Exceptions;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Infrastructure.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 namespace FullTractor.Infrastructure.Repositories;
 
@@ -26,6 +28,11 @@ public class UserRepository : IUserRepository
         return await _fullTractorContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
     }
 
+    public async Task<string?> GetPasswordByEmailAsync(string email)
+    {
+        return await _fullTractorContext.Users.AsNoTracking().Where(u => u.Email == email).Select(u => u.PasswordHash).FirstOrDefaultAsync();
+    }
+
     public async Task<User> CreateUserAsync(User user)
     {
         try
@@ -36,13 +43,17 @@ public class UserRepository : IUserRepository
         }
         catch (DbUpdateException updateEx)
         {
-            throw new Exception("Unable to create user. Verify if the properties are correct or the database connection.", updateEx);
+            if (updateEx.InnerException is SqlException upEx && (upEx.Number == 2627 || upEx.Number == 2601))
+            {
+                throw new DuplicateRecordException($"{user.Email} already exist");
+            }
+            throw;
         }
     }
 
-    public async Task<User?> UpdateUserAsync(User user)
+    public async Task<User?> UpdateUserAsync(int id, User user)
     {
-        int numUpdated = await _fullTractorContext.Users.Where(u => u.Id == user.Id).ExecuteUpdateAsync(setter => setter
+        int numUpdated = await _fullTractorContext.Users.Where(u => u.Id == id).ExecuteUpdateAsync(setter => setter
                                                                     .SetProperty(u => u.Name, user.Name)
                                                                     .SetProperty(u => u.LastName, user.LastName)
                                                                     .SetProperty(u => u.Address, user.Address)
@@ -52,9 +63,9 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<bool> DeleteUserAsync(int userId)
+    public async Task<bool> DeleteUserAsync(int id)
     {
-        int numDeleted = await _fullTractorContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync();
+        int numDeleted = await _fullTractorContext.Users.Where(u => u.Id == id).ExecuteDeleteAsync();
         if (numDeleted == 0) return false;
         return true;
     }

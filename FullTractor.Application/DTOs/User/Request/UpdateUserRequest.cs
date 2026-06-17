@@ -1,7 +1,6 @@
 namespace FullTractor.Application.DTOs;
-public class UserResponse
+public class UpdateUserRequest
 {
-    public int Id {get; set;}
     public required string Name { get; set; }
     public required string LastName { get; set; }
     public required string Address { get; set; }

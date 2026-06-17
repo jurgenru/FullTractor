@@ -12,5 +12,5 @@ public class User
     public required string City { get; set; }
     public required string CellPhone { get; set; }
     public required string Email { get; set; }
-    public required string PasswordHash { get; set; }
+    public string? PasswordHash { get; set; }
 }
