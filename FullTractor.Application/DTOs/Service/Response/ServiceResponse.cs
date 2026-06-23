@@ -1,5 +1,5 @@
 using FullTractor.Application.Enums;
-namespace FullTractor.Application.DTOs.Service;
+namespace FullTractor.Application.DTOs.Service.Response;
 
 public class ServiceResponse<T> where T: class
 {

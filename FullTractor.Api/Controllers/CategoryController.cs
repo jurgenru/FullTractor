@@ -1,13 +1,15 @@
 using FullTractor.Application.DTOs.Category.Request;
 using FullTractor.Application.DTOs.Category.Response;
-using FullTractor.Application.DTOs.Service;
-using FullTractor.Application.Interfaces;
 using FullTractor.Application.Enums;
 using Microsoft.AspNetCore.Mvc;
+using FullTractor.Application.DTOs.Service.Response;
+using FullTractor.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 namespace FullTractor.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -32,6 +34,7 @@ public class CategoryController : ControllerBase
         return Ok(getCategory);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> CreateCategoryAsync([FromBody] CreateCategoryRequest createCategory)
     {
@@ -41,10 +44,11 @@ public class CategoryController : ControllerBase
             case Status.CategoryExists:
                 return Problem(statusCode: StatusCodes.Status409Conflict, detail: categoryCreated.Status.ToString());
             default:
-                return CreatedAtAction(nameof(GetCategoryByIdAsync), new {id = categoryCreated.Data?.Id}, categoryCreated);
+                return CreatedAtAction("GetCategoryById", new {id = categoryCreated.Data?.Id}, categoryCreated);
         }        
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> UpdateCategoryAsync([FromRoute]int id, [FromBody]UpdateCategoryRequest updateCategory)
     {
@@ -60,6 +64,7 @@ public class CategoryController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<CategoryResponse>>> DeleteCategoryAsync([FromRoute]int id)
     {

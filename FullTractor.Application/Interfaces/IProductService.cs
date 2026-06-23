@@ -1,6 +1,7 @@
 using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.DTOs.Product.Response;
 using FullTractor.Application.DTOs.Product;
+using FullTractor.Application.DTOs.Service.Response;
 
 namespace FullTractor.Application.Interfaces;
 

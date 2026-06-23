@@ -1,11 +1,14 @@
-using FullTractor.Application.DTOs;
-using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FullTractor.Application.Enums;
+using FullTractor.Application.DTOs.Service.Response;
+using FullTractor.Application.DTOs.User.Response;
+using FullTractor.Application.DTOs.User.Request;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -13,6 +16,7 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
+    
     [HttpGet("{id}")]
     public async Task<ActionResult<ServiceResponse<UserResponse>>> GetUserByIdAsync([FromRoute] int id)
     {
@@ -29,21 +33,7 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<ServiceResponse<UserResponse>>> GetPasswordByEmailAsync(UserRequest userRequest)
-    {
-        ServiceResponse<UserResponse> user = await _userService.GetPasswordByEmailAsync(userRequest);
-        switch (user.Status)
-        {
-            case Status.NotFound:
-                return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Status.ToString());
-            case Status.PasswordIncorrect:
-                return Problem(statusCode: StatusCodes.Status401Unauthorized, detail: user.Status.ToString());
-            default:
-                return Ok(user);
-        }
-    }
-
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<UserResponse>>> CreateUserAsync([FromBody] UserRequest userRequest)
     {
@@ -57,6 +47,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ServiceResponse<UserResponse>>> UpdateUserAsync([FromRoute] int id, [FromBody] UpdateUserRequest updateUserRequest)
     {
@@ -72,6 +63,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<UserResponse>>> DeleteUserAsync([FromRoute] int id)
     {

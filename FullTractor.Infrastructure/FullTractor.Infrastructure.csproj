@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FullTractor.Domain\FullTractor.Domain.csproj" />
+    <ProjectReference Include="..\FullTractor.Application\FullTractor.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

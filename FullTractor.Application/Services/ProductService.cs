@@ -1,12 +1,11 @@
 using FullTractor.Application.DTOs.Product;
 using FullTractor.Application.DTOs.Product.Response;
-using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Application.Enums;
-using FullTractor.Application.DTOs.Category.Response;
 using FullTractor.Domain.Exceptions;
+using FullTractor.Application.DTOs.Service.Response;
 
 namespace FullTractor.Application.Services;
 
