@@ -1,6 +1,6 @@
 using FullTractor.Application.DTOs.Category.Request;
 using FullTractor.Application.DTOs.Category.Response;
-using FullTractor.Application.DTOs.Service;
+using FullTractor.Application.DTOs.Service.Response;
 
 namespace FullTractor.Application.Interfaces;
 

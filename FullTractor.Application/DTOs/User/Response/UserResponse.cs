@@ -1,7 +1,8 @@
-namespace FullTractor.Application.DTOs;
+namespace FullTractor.Application.DTOs.User.Response;
+
 public class UserResponse
 {
-    public int Id {get; set;}
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string LastName { get; set; }
     public required string Address { get; set; }

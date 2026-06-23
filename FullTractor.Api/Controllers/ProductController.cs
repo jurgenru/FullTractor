@@ -1,12 +1,15 @@
 using FullTractor.Application.DTOs.Product;
 using FullTractor.Application.DTOs.Product.Response;
 using FullTractor.Application.DTOs.Service;
+using FullTractor.Application.DTOs.Service.Response;
 using FullTractor.Application.Enums;
 using FullTractor.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -15,6 +18,7 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<ServiceResponse<List<ProductResponse>>>> GetAllProductsAsync()
     {
@@ -31,6 +35,7 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
+    [AllowAnonymous]
     [HttpGet("{categoryId}/products")]
     public async Task<ActionResult<ServiceResponse<List<ProductResponse>>>> GetProductsByCategoryIdAsync([FromRoute] int categoryId)
     {
@@ -39,6 +44,7 @@ public class ProductController : ControllerBase
         return Ok(productList);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<ProductResponse>>> CreateProductAsync([FromBody] CreateProductRequest createProduct)
     {
@@ -52,6 +58,7 @@ public class ProductController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ServiceResponse<ProductResponse>>> UpdateProductAsynct([FromRoute] int id, [FromBody] UpdateProductRequest updateProduct)
     {
@@ -67,6 +74,7 @@ public class ProductController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<ProductResponse>>> DeleteProductAsync([FromRoute] int id)
     {

@@ -1,6 +1,6 @@
 using FullTractor.Application.DTOs.Category.Request;
 using FullTractor.Application.DTOs.Category.Response;
-using FullTractor.Application.DTOs.Service;
+using FullTractor.Application.DTOs.Service.Response;
 using FullTractor.Application.Enums;
 using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;

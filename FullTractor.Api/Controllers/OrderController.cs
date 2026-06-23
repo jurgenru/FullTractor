@@ -3,11 +3,14 @@ using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FullTractor.Application.Enums;
+using FullTractor.Application.DTOs.Service.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FullTractor.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -23,6 +26,7 @@ public class OrderController : ControllerBase
         if (ordersByUserId.Status == Status.NotFound) return Problem(statusCode: StatusCodes.Status404NotFound, detail: ordersByUserId.Status.ToString());
         return Ok(ordersByUserId);
     }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ServiceResponse<OrderResponse>>> GetOrderByIdAsync([FromRoute] int id)
     {
@@ -30,6 +34,7 @@ public class OrderController : ControllerBase
         if (orderById.Status == Status.NotFound) return Problem(statusCode: StatusCodes.Status404NotFound, detail: orderById.Status.ToString());
         return Ok(orderById);
     }
+
     [HttpGet("{id}/orderItems")]
     public async Task<ActionResult<ServiceResponse<List<OrderItemResponse>>>> GetOrderItemByOrderIdAsync([FromRoute] int id)
     {
@@ -37,6 +42,7 @@ public class OrderController : ControllerBase
         if (orderItems.Status == Status.NotFound) return Problem(statusCode: StatusCodes.Status404NotFound, detail: orderItems.Status.ToString());
         return Ok(orderItems);
     }
+
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<OrderResponse>>> CreateOrderAsync([FromBody] CreateOrderRequest createOrderRequest)
     {
@@ -44,6 +50,8 @@ public class OrderController : ControllerBase
         if(createOrder.Status == Status.CreateOrderError) return Problem(statusCode: StatusCodes.Status409Conflict, detail: createOrder.Status.ToString());
         return Ok(createOrder);
     }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ServiceResponse<OrderResponse>>> DeleteOrderAsync([FromRoute]int id)
     {

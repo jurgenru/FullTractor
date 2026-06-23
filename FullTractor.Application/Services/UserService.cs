@@ -1,11 +1,12 @@
-using FullTractor.Application.DTOs;
-using FullTractor.Application.DTOs.Service;
 using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Application.Enums;
 using FullTractor.Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
+using FullTractor.Application.DTOs.User.Request;
+using FullTractor.Application.DTOs.Service.Response;
+using FullTractor.Application.DTOs.User.Response;
 
 namespace FullTractor.Application.Services;
 
@@ -23,24 +24,6 @@ public class UserService : IUserService
         User? user = await _userRepository.GetUserByEmailAsync(email);
         if (user == null) return new ServiceResponse<UserResponse> { Status = Status.NotFound };
         return ConvertToUserResponse(user);
-    }
-
-    public async Task<ServiceResponse<UserResponse>> GetPasswordByEmailAsync(UserRequest userRequest)
-    {
-        ServiceResponse<UserResponse> userExist = await GetUserByEmailAsync(userRequest.Email);
-        if (userExist.Status == Status.NotFound) return userExist;
-        string? password = await _userRepository.GetPasswordByEmailAsync(userRequest.Email);
-        if (password == null) return new ServiceResponse<UserResponse> { Status = Status.NotFound };
-        PasswordVerificationResult passwordStatus = _passwordHasher.VerifyHashedPassword(userRequest, password, userRequest.PasswordHash);
-        switch (passwordStatus)
-        {
-            case PasswordVerificationResult.Failed:
-                return new ServiceResponse<UserResponse> { Status = Status.PasswordIncorrect };
-            case PasswordVerificationResult.SuccessRehashNeeded:
-                return new ServiceResponse<UserResponse> { Status = Status.PasswordIncorrect };
-            default:
-                return await GetUserByEmailAsync(userRequest.Email);
-        }
     }
 
     public async Task<ServiceResponse<UserResponse>> GetUserByIdAsync(int id)

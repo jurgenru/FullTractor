@@ -1,4 +1,4 @@
-namespace FullTractor.Application.DTOs;
+namespace FullTractor.Application.DTOs.User.Request;
 public class UpdateUserRequest
 {
     public required string Name { get; set; }
