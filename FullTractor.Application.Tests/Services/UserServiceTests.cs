@@ -1,4 +1,4 @@
-using FullTractor.Application.DTOs;
+using FullTractor.Application.DTOs.User.Request;
 using FullTractor.Application.Enums;
 using FullTractor.Application.Services;
 using FullTractor.Domain.Entities;
