@@ -1,4 +1,5 @@
 using System.Text;
+using FullTractor.Api.Exceptions;
 using FullTractor.Application.DTOs.User.Request;
 using FullTractor.Application.Interfaces;
 using FullTractor.Application.Services;
@@ -32,6 +33,8 @@ builder.Services.AddAuthentication().AddJwtBearer(options => options.TokenValida
 builder.Services.AddControllers();
 // Add ProblemDetails forma.
 builder.Services.AddProblemDetails();
+//Control global generic exception
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Add context to the project.
 builder.Services.AddDbContext<FullTractorContext>(options => options.UseSqlServer(connectionString));
 //Add DI of passwordhasher
@@ -53,10 +56,9 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
 //Catch global exceptions and translate it to ProblemDetails format
 app.UseExceptionHandler();
-//Cathc from 400 to 599 errors and translate it to ProblemDetails format
+//Catch from 400 to 599 errors and translate it to ProblemDetails format
 app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
