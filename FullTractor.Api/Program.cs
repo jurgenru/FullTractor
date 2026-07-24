@@ -23,10 +23,10 @@ builder.Services.AddAuthentication().AddJwtBearer(options => options.TokenValida
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtSettings:Key").Get<string>()!)),
     ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateLifetime = true,
     ValidIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Get<string>(),
-    ValidAudience = builder.Configuration.GetSection("JwtSettings:Audience").Get<string>()
+    ValidateAudience = true,
+    ValidAudience = builder.Configuration.GetSection("JwtSettings:Audience").Get<string>(),
+    ValidateLifetime = true,
 });
 
 // Add services to the container.
