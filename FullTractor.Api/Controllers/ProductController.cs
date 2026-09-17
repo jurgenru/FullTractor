@@ -7,6 +7,8 @@ using FullTractor.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace FullTractor.Api.Controllers;
+
 [ApiController]
 [Route("[controller]")]
 [Authorize]

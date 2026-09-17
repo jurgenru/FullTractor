@@ -6,6 +6,8 @@ using FullTractor.Application.DTOs.User.Response;
 using FullTractor.Application.DTOs.User.Request;
 using Microsoft.AspNetCore.Authorization;
 
+namespace FullTractor.Api.Controllers;
+
 [ApiController]
 [Route("[controller]")]
 [Authorize]

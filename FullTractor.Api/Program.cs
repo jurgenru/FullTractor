@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using FullTractor.Api.Exceptions;
 using FullTractor.Application.DTOs.User.Request;
 using FullTractor.Application.Interfaces;
@@ -30,7 +31,9 @@ builder.Services.AddAuthentication().AddJwtBearer(options => options.TokenValida
 });
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => {
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 // Add ProblemDetails forma.
 builder.Services.AddProblemDetails();
 //Control global generic exception

@@ -7,15 +7,12 @@ public enum Status
     CategoryHasProductsRelated,
     DeleteError,
     UpdateError,
-    DuplicateError,
     CategoryExists,
     CategoryNotExists,
     ProductExists,
     ProductNotExists,
     OrderItemNotExist,
     CreateOrderError,
-    UserExists,
-    PasswordCorrect,
     PasswordIncorrect,
     EmailExists
 }
