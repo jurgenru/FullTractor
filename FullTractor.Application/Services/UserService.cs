@@ -2,6 +2,7 @@ using FullTractor.Application.Interfaces;
 using FullTractor.Domain.Entities;
 using FullTractor.Domain.Interfaces;
 using FullTractor.Application.Enums;
+using FullTractor.Domain.Enums;
 using FullTractor.Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using FullTractor.Application.DTOs.User.Request;
@@ -40,8 +41,9 @@ public class UserService : IUserService
         {
             try
             {
-                string hashPassword = _passwordHasher.HashPassword(userRequest, userRequest.PasswordHash);
-                User user = await _userRepository.CreateUserAsync(new User { Email = userRequest.Email, PasswordHash = hashPassword, Name = "", Address = "", CellPhone = "", LastName = "", City = "" });
+                string hashPassword = _passwordHasher.HashPassword(userRequest, userRequest.Password);
+                // Public registration only ever creates customers. Admins are promoted separately.
+                User user = await _userRepository.CreateUserAsync(new User { Email = userRequest.Email, PasswordHash = hashPassword, Role = Role.Customer, Name = "", Address = "", CellPhone = "", LastName = "", City = "" });
                 return ConvertToUserResponse(user);
             }
             catch (DuplicateRecordException)
@@ -56,9 +58,16 @@ public class UserService : IUserService
     {
         ServiceResponse<UserResponse> userExists = await GetUserByIdAsync(id);
         if (userExists.Status == Status.NotFound) return userExists;
-        User? user = await _userRepository.UpdateUserAsync(id, new User { Name = updateUserRequest.Name, Address = updateUserRequest.Address, CellPhone = updateUserRequest.CellPhone, City = updateUserRequest.City, Email = updateUserRequest.Email, LastName = updateUserRequest.LastName });
-        if (user == null) return new ServiceResponse<UserResponse> { Status = Status.UpdateError };
-        return ConvertToUserResponse(user);
+        try
+        {
+            User? user = await _userRepository.UpdateUserAsync(id, new User { Name = updateUserRequest.Name, Address = updateUserRequest.Address, CellPhone = updateUserRequest.CellPhone, City = updateUserRequest.City, Email = updateUserRequest.Email, LastName = updateUserRequest.LastName });
+            if (user == null) return new ServiceResponse<UserResponse> { Status = Status.UpdateError };
+            return ConvertToUserResponse(user);
+        }
+        catch (DuplicateRecordException)
+        {
+            return new ServiceResponse<UserResponse> { Status = Status.EmailExists };
+        }
     }
 
     public async Task<ServiceResponse<UserResponse>> DeleteUserAsync(int id)

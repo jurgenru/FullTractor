@@ -24,7 +24,8 @@ public class AuthService : IAuthService
     {
         User? user = await _userRepository.GetUserByEmailAsync(userRequest.Email);
         if (user == null) return new ServiceResponse<LoginResponse> { Status = Status.NotFound };
-        PasswordVerificationResult passwordStatus = _passwordHasher.VerifyHashedPassword(userRequest, user.PasswordHash, userRequest.PasswordHash);
+        PasswordVerificationResult passwordStatus = _passwordHasher.VerifyHashedPassword(userRequest, user.PasswordHash, userRequest.Password);
+        
         switch (passwordStatus)
         {
             case PasswordVerificationResult.Failed:

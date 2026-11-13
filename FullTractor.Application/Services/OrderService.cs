@@ -35,18 +35,16 @@ public class OrderService : IOrderService
         return new ServiceResponse<List<OrderItemResponse>> { Status = Status.OrderItemNotExist };
     }
 
-    public async Task<ServiceResponse<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderRequest)
+    public async Task<ServiceResponse<OrderResponse>> CreateOrderAsync(int userId, CreateOrderRequest createOrderRequest)
     {
-        Order order = new Order
-        {
-            UserId = createOrderRequest.UserId,
-            OrderDate = createOrderRequest.OrderDate,
-            TotalPrice = createOrderRequest.TotalPrice,
-            OrderItems = [.. createOrderRequest.OrderItems.Select(cO => new OrderItem { Name = cO.Name, HistoricalPrice = cO.HistoricalPrice, Quantity = cO.Quantity, ProductId = cO.ProductId })]
-        };
-        Order orderCreated = await _orderRepository.CreateOrderAsync(order);
-        if(orderCreated != null) return ConvertOrderResponse(orderCreated);
-        return new ServiceResponse<OrderResponse> {Status = Status.CreateOrderError};
+        // Merge repeated products so stock is checked against the total quantity.
+        Dictionary<int, int> quantities = createOrderRequest.Items
+            .GroupBy(i => i.ProductId)
+            .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity));
+
+        Order? orderCreated = await _orderRepository.CreateOrderAsync(userId, quantities);
+        if (orderCreated == null) return new ServiceResponse<OrderResponse> { Status = Status.InsufficientStock };
+        return ConvertOrderResponse(orderCreated);
     }
 
     public async Task<ServiceResponse<OrderResponse>> DeleteOrderAsync(int id)
@@ -60,14 +58,14 @@ public class OrderService : IOrderService
 
     private ServiceResponse<List<OrderResponse>> ConvertListOrderResponse(List<Order> order)
     {
-        return new ServiceResponse<List<OrderResponse>> { Status = Status.Success, Data = [.. order.Select(o => new OrderResponse { Id = o.Id, OrderDate = o.OrderDate, TotalPrice = o.TotalPrice })] };
+        return new ServiceResponse<List<OrderResponse>> { Status = Status.Success, Data = [.. order.Select(o => new OrderResponse { Id = o.Id, UserId = o.UserId, OrderDate = o.OrderDate, TotalPrice = o.TotalPrice })] };
     }
     private ServiceResponse<OrderResponse> ConvertOrderResponse(Order order)
     {
-        return new ServiceResponse<OrderResponse> { Status = Status.Success, Data = new OrderResponse { Id = order.Id, OrderDate = order.OrderDate, TotalPrice = order.TotalPrice } };
+        return new ServiceResponse<OrderResponse> { Status = Status.Success, Data = new OrderResponse { Id = order.Id, UserId = order.UserId, OrderDate = order.OrderDate, TotalPrice = order.TotalPrice } };
     }
     private ServiceResponse<List<OrderItemResponse>> ConvertListOrderItemResponse(ICollection<OrderItem> orderItems)
     {
-        return new ServiceResponse<List<OrderItemResponse>> { Status = Status.Success, Data = [.. orderItems.Select(oI => new OrderItemResponse { Name = oI.Name, HistoricalPrice = oI.HistoricalPrice, ProductId = oI.Id, Quantity = oI.Quantity })] };
+        return new ServiceResponse<List<OrderItemResponse>> { Status = Status.Success, Data = [.. orderItems.Select(oI => new OrderItemResponse { OrderItemId = oI.Id, Name = oI.Name, HistoricalPrice = oI.HistoricalPrice, ProductId = oI.ProductId, Quantity = oI.Quantity })] };
     }
 }

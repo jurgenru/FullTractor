@@ -40,7 +40,7 @@ public class UserServiceTests
         var service = new UserService(mockUserRepo.Object, mockPasswordHasher.Object);
 
         //Act
-        var result = await service.CreateUserAsync(new UserRequest { Email = "correoIgual@gmail.com", PasswordHash = "123" });
+        var result = await service.CreateUserAsync(new UserRequest { Email = "correoIgual@gmail.com", Password = "123" });
 
         //Assert
         Assert.Equal(Status.EmailExists, result.Status);
@@ -60,7 +60,7 @@ public class UserServiceTests
         var service = new UserService(mockUserRepo.Object, mockPasswordHasher.Object);
 
         //Act
-        var result = await service.CreateUserAsync(new UserRequest { Email = "correoIgual@gmail.com", PasswordHash = "123" });
+        var result = await service.CreateUserAsync(new UserRequest { Email = "correoIgual@gmail.com", Password = "123" });
 
         //Assert
         Assert.Equal(Status.Success, result.Status);

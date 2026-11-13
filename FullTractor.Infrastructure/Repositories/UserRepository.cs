@@ -53,14 +53,24 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> UpdateUserAsync(int id, User user)
     {
-        int numUpdated = await _fullTractorContext.Users.Where(u => u.Id == id).ExecuteUpdateAsync(setter => setter
-                                                                    .SetProperty(u => u.Name, user.Name)
-                                                                    .SetProperty(u => u.LastName, user.LastName)
-                                                                    .SetProperty(u => u.Address, user.Address)
-                                                                    .SetProperty(u => u.CellPhone, user.CellPhone)
-                                                                    .SetProperty(u => u.City, user.City));
-        if (numUpdated == 0) return null;
-        return user;
+        try
+        {
+            int numUpdated = await _fullTractorContext.Users.Where(u => u.Id == id).ExecuteUpdateAsync(setter => setter
+                                                                        .SetProperty(u => u.Name, user.Name)
+                                                                        .SetProperty(u => u.LastName, user.LastName)
+                                                                        .SetProperty(u => u.Address, user.Address)
+                                                                        .SetProperty(u => u.CellPhone, user.CellPhone)
+                                                                        .SetProperty(u => u.City, user.City)
+                                                                        .SetProperty(u => u.Email, user.Email));
+            if (numUpdated == 0) return null;
+            user.Id = id;
+            return user;
+        }
+        // ExecuteUpdate can surface the SqlException directly or wrapped, so check both.
+        catch (Exception ex) when ((ex as SqlException ?? ex.InnerException as SqlException) is { Number: 2627 or 2601 })
+        {
+            throw new DuplicateRecordException($"{user.Email} already exist");
+        }
     }
 
     public async Task<bool> DeleteUserAsync(int id)

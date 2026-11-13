@@ -9,13 +9,14 @@ using FullTractor.Application.DTOs.Service.Response;
 
 namespace FullTractor.Application.Services;
 
-public class ProductService : IProductService
+public class ProductService(IProductRepository productRepository) : IProductService
 {
-    private readonly IProductRepository _productRepository;
-    public ProductService(IProductRepository productRepository)
-    {
-        _productRepository = productRepository;
-    }
+    private readonly IProductRepository _productRepository = productRepository;
+    // private readonly IProductRepository productRepository;
+    // public ProductService(IProductRepository productRepository)
+    // {
+    //     productRepository = productRepository;
+    // }
     public async Task<ServiceResponse<List<ProductResponse>>> GetAllProductsAsync()
     {
         List<Product> listProduct = await _productRepository.GetAllProductsAsync();
@@ -75,10 +76,26 @@ public class ProductService : IProductService
     private ServiceResponse<List<ProductResponse>> ConvertToProductList(List<Product> productList)
     {
         if (productList.Count == 0) return new ServiceResponse<List<ProductResponse>> { Status = Status.NotFound };
-        return new ServiceResponse<List<ProductResponse>> { Status = Status.Success, Data = [.. productList.Select(p => new ProductResponse { Id = p.Id, Name = p.Name, Description = p.Description, Stock = p.Stock, Price = p.Price, CategoryId = p.CategoryId })] };
+        List<ProductResponse> productResponse =
+        [
+            .. productList.Select(p => new ProductResponse(p.Id, p.CategoryId, p.Name, p.Stock, p.Price, p.Description ?? ""))
+        ];
+        return new ServiceResponse<List<ProductResponse>> { Status = Status.Success, Data = productResponse };
     }
-    private ServiceResponse<ProductResponse> ConvertToProductResponse(Product product)
+    private ServiceResponse<ProductResponse> ConvertToProductResponse(Product product) => new ServiceResponse<ProductResponse>
+        {
+            Status = Status.Success, 
+            Data = new ProductResponse(product.Id, product.CategoryId, product.Name,
+                product.Stock, product.Price, product.Description ?? "")
+        };
+
+    private string StockStamp(Product product)
     {
-        return new ServiceResponse<ProductResponse> { Status = Status.Success, Data = new ProductResponse { Id = product.Id, Description = product.Description, Name = product.Name, Price = product.Price, Stock = product.Stock, CategoryId = product.CategoryId } };
+        return product switch
+        {
+            { Stock: 0 } => "Agotado",
+            { Stock: < 5 } => "Ultimas unidades",
+            _ => "Disponible",
+        };
     }
 }

@@ -14,5 +14,6 @@ public enum Status
     OrderItemNotExist,
     CreateOrderError,
     PasswordIncorrect,
-    EmailExists
+    EmailExists,
+    InsufficientStock
 }
